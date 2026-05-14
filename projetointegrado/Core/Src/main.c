@@ -56,6 +56,7 @@ char s[3];
 char alunos[2];
 int Qa = 0;
 int senhaexibi;
+int total = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -66,6 +67,7 @@ static void MX_SPI1_Init(void);
 void gerador(void);
 void exibirsenhad(void);
 void exibirqalunos(void);
+void exibiralunos(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -111,7 +113,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  int liberado = 1;
+	  int liberado = 0;
 	  int s1_at = s1;
 	  int s2_at = s2;
 	  int s3_at = s3;
@@ -119,11 +121,10 @@ int main(void)
 	  int s2_ant = s2_at;
 	  int s3_ant = s3_at;
 	  int a = 0; // senha digitada
-	  int Q = 1;
+	  int Q = 0;
 	  int C = 0;
 	  int A = 0;
 	  int N = 0;
-	  int total = 0;
 	  int IP = 0; // inseridos pelo professor no código anterior que eu já tenho.
 	  int K = 0;
 	  int AF = 0; // alunos que estão fora que irão entrar.
@@ -145,7 +146,6 @@ int main(void)
 	  ST7789_Fill_Color(WHITE);
 	  ST7789_WriteString(30, 20,"Iniciar Aula", Font_16x26, BLACK, WHITE);
 	  ST7789_WriteString(30, 63,"Confirmar = PA9", Font_11x18, BLACK, WHITE);
-	  exibirqalunos();
 	  while (1)
 	  {
 	      if (s1 == 0 && liberado == 0)
@@ -156,8 +156,6 @@ int main(void)
 	          pos = 0;
 	          a = 0;
 	          gerador();
-	          ST7789_Fill_Color(WHITE);
-	          ST7789_WriteString(20, 20,senha, Font_16x26, BLACK, WHITE);
 	          HAL_Delay(3000);
 	          exibirsenhad();
 	      }
@@ -255,11 +253,7 @@ int main(void)
 	    	  }
 	    	  if (s1 == 0){
 	    		  C = 1;
-	    		  char casdv[20];
-	    		  total = atoi(alunos);
-	    		  sprintf(casdv, "Aula (Aluno s%d/%d2", total, atoi(alunos));
-	    		  ST7789_Fill_Color(WHITE);
-	    		  ST7789_WriteString(30, 20,casdv, Font_11x18, BLACK, WHITE);
+	    		  exibiralunos();
 	    		  //ST7789_WriteString(70, 50,s, Font_11x18, BLACK, WHITE);
 	    	  }
 	      }
@@ -288,26 +282,22 @@ int main(void)
 
 	    	  if(N==1)//entrada
 	    	  {
-	    		  if(total>alunos[2]){
-	    			  //???
-	    		  } else if(total<alunos[2]){
+	    		  if(total<atoi(alunos)){
 	    			  total++;
 	    		  }
 	    		  N = 0;
+	    		  exibiralunos();
 	    	  }
 
 	    	  if(K==1)  //saída da sala
 	    	  {
-	    		  if(AF>=3){
-	    			  //???
-	    		  }
-
-	    		  else if(AF<3 && total>0){
+	    		  if(AF<3 && total>0){
 	    			  AF++;
 	    			  total--;
 	    		  }
 
 	    		  K = 0;
+	    		  exibiralunos();
 	    	  }
 
 	    	  if(S==1)// retorno para sala
@@ -320,12 +310,22 @@ int main(void)
 	    		  }
 
 	    		  S = 0;
+	    		  exibiralunos();
 	    	  }
 
 
 	    	  if(s1==0 && s2==0){
 
 	    		  liberado = 0;
+	    		  ST7789_Fill_Color(WHITE);
+	    		  char casdv[20];
+	    		  sprintf(casdv, "Alunos max: %d",atoi(alunos));
+	    		  ST7789_WriteString(20, 20,"Relatorio", Font_11x18, BLACK, WHITE);
+	    		  ST7789_WriteString(20, 40,casdv, Font_11x18, BLACK, WHITE);
+	    		  sprintf(casdv, "Final aula: %d",atoi(alunos));
+	    		  ST7789_WriteString(20, 60,casdv, Font_11x18, BLACK, WHITE);
+	    		  ST7789_WriteString(20, 80,"Aula finalizada!", Font_11x18, BLACK, WHITE);
+	    		  HAL_Delay(5000);
 	    		  break;
 	    	  }
 	      }
@@ -461,7 +461,7 @@ static void MX_GPIO_Init(void)
 		 senha[i] = '0' + digito;
 	 }
 	 senha[3] = '0';
-	 senhaexibi = senha;
+	 senhaexibi = atoi(senha);
 
  }
 
@@ -482,6 +482,16 @@ static void MX_GPIO_Init(void)
 	 ST7789_WriteString(70, 50,alunos, Font_11x18, BLACK, WHITE);
 	 ST7789_WriteString(30, 70, casdv, Font_11x18, BLACK, WHITE);
 	 ST7789_WriteString(30, 90, "Salvar = PA9", Font_11x18, BLACK, WHITE);
+ }
+
+ void exibiralunos(void) {
+	 char casdv[20];
+	 sprintf(casdv, "Aula (Alunos %d/%d", total, atoi(alunos));
+	 ST7789_Fill_Color(WHITE);
+	 ST7789_WriteString(20, 20,casdv, Font_11x18, BLACK, WHITE);
+	 ST7789_WriteString(20, 40,"Entrada = PA9", Font_11x18, BLACK, WHITE);
+	 ST7789_WriteString(20, 60,"Saida = PA10", Font_11x18, BLACK, WHITE);
+	 ST7789_WriteString(20, 80,"Retorno = PA11", Font_11x18, BLACK, WHITE);
  }
 /* USER CODE END 4 */
 
